@@ -17,19 +17,20 @@ import java.util.Set;
  * @author antoniomejorado
  */
 public class Game implements Runnable {
-    private BufferStrategy bs;      // to have several buffers when displaying
-    private Graphics g;             // to paint objects
-    private Display display;        // to display in the game
-    String title;                   // title of the window
-    private int width;              // width of the window
-    private int height;             // height of the window
-    private Thread thread;          // thread to create the game
-    private boolean running;        // to set the game
-    private boolean started;        // to start the game
-    private Bar bar;                // to use a bar
-    private Ball ball;              // little ball
-    private ArrayList<Brick> bricks;// bricks
-    private KeyManager keyManager;  // to manage the keyboard
+    private BufferStrategy bs;          // to have several buffers when displaying
+    private Graphics g;                 // to paint objects
+    private Display display;            // to display in the game
+    String title;                       // title of the window
+    private int width;                  // width of the window
+    private int height;                 // height of the window
+    private Thread thread;              // thread to create the game
+    private boolean running;            // to set the game
+    private boolean started;            // to start the game
+    private Bar bar;                    // to use a bar
+    private ArrayList<Ball> balls;      // to have multiple balls when rewarded 
+    private ArrayList<Brick> bricks;    // bricks
+    private ArrayList<Perk> perks;      // perks
+    private KeyManager keyManager;      // to manage the keyboard
     
     
     /**
@@ -39,6 +40,8 @@ public class Game implements Runnable {
      * @param height  to set the height of the window
      */
     public Game(String title, int width, int height) {
+        this.balls = new ArrayList<Ball>();
+        this.perks = new ArrayList<Perk>();
         this.title = title;
         this.width = width;
         this.height = height;
@@ -79,14 +82,19 @@ public class Game implements Runnable {
          display = new Display(title, getWidth(), getHeight());  
          Assets.init();
          bar = new Bar(getWidth() / 2 - 50, getHeight() - 100, 100, 25, this);
-         ball = new Ball(getWidth() / 2 - 10, getHeight() - 120, 20, 20, 0, 0, this);
+         Ball ball = new Ball(getWidth() / 2 - 10, getHeight() - 120, 20, 20, 0, 0, this);
+         balls.add(ball);
          bricks = new ArrayList<Brick>();
          int width_brick = getWidth() / 10 - 6;
          int height_brick = getHeight() / 3 / 5  - 10;
          for (int i = 0; i < 10; i++) {
              for (int j = 0; j < 5; j++) {
+                 int perk = (int)(Math.random() * 3.0); // 33% chance of having a perk
+                 if(perk > 0){
+                     perk = (int)(Math.random() * 7.0) + 1; // there are 7 different perks
+                 }
                  Brick brick = new Brick(i * (width_brick + 3) + 15 , 
-                         j * (height_brick + 5) + 15 , width_brick, height_brick, 3, this);
+                         j * (height_brick + 5) + 15 , width_brick, height_brick, 3, this, perk);
                  bricks.add(brick);
              }
          }
@@ -133,18 +141,21 @@ public class Game implements Runnable {
         // if space and game has not started
         if (this.getKeyManager().space && !this.isStarted()) {
             this.setStarted(true);
-            ball.setSpeedX(1);
-            ball.setSpeedY(-1);
+            balls.get(0).setSpeedX(3);
+            balls.get(0).setSpeedY(-3);
         }
         // moving bar
         bar.tick();
         // if game has started
         if (this.isStarted()) {
-            // moving the ball
-            ball.tick();
+            // moving the balls
+            int ballCount = balls.size();
+            for(int i = 0; i < ballCount; i++){
+                balls.get(i).tick();
+            }
         } else {
             // moving the ball based on the bar
-            ball.setX(bar.getX() + bar.getWidth() / 2 - ball.getWidth() / 2);
+            balls.get(0).setX(bar.getX() + bar.getWidth() / 2 - balls.get(0).getWidth() / 2);
         }
         if(bricks.size()==49){
             bar.setWidth(bar.getWidth()*2);
@@ -153,50 +164,63 @@ public class Game implements Runnable {
         // check collision bricks versus ball
         for (int i = 0; i < bricks.size(); i++) {
             Brick brick = (Brick) bricks.get(i);
-            if (ball.intersects(brick) && brick.getPower()==3) {
-                brick.setPower(brick.getPower()-1);
-                ball.setSpeedY(ball.getSpeedY() * -1);
-            }else if(ball.intersects(brick) && brick.getPower()==2){
-                brick.setPower(brick.getPower()-1);
-                ball.setSpeedY(ball.getSpeedY() * -1);
-            }
-            else if(ball.intersects(brick) && brick.getPower()==1){
-                brick.setPower(brick.getPower()-1);
-                ball.setSpeedY(ball.getSpeedY() * -1);
-            }else if(ball.intersects(brick) && brick.getPower()==0){
-                bricks.remove(brick);
-                ball.setSpeedY(ball.getSpeedY() * -1);
-                i--;                
+            for(int j = 0; j < balls.size(); j++){
+                Ball ball = (Ball) balls.get(j);
+                if (ball.intersects(brick) && brick.getPower() > 1) {
+                    // will not be destroyed
+                    brick.setPower(brick.getPower()-1);
+                    ball.setSpeedY(ball.getSpeedY() * -1);
+                }
+                else if(ball.intersects(brick)){
+                    if(brick.getHiddenPerk() > 0){
+                        // release the perk
+                        Perk releasedPerk = new Perk(brick.getX(), brick.getY(), brick.getWidth(), brick.getHeight(), brick.getHiddenPerk());
+                        perks.add(releasedPerk);
+                        System.out.println("Adding a perk");
+                    }
+                    bricks.remove(brick);
+                    ball.setSpeedY(ball.getSpeedY() * -1);
+                    // avoid collision with two at the time (NOT WORKING) contact me through facebook to see why
+                    break;
+                }
             }
         }
         
         // check collision ball versus bar and modify speed accordingly
         // the x-speed and y-speed of the ball can never be 0
-        if (ball.intersects(bar)) {
-            ball.setY(bar.getY() - 21);
-            ball.setSpeedY(ball.getSpeedY() * -1);
-            if(this.getKeyManager().left || this.getKeyManager().right){
-                // speed up
-                if(ball.getSpeedX() > 0){
-                    ball.setSpeedX(ball.getSpeedX() + 1);
+        for(int i = 0; i < balls.size(); i++){
+            Ball ball = (Ball) balls.get(i);
+            if (ball.intersects(bar)) {
+                ball.setY(bar.getY() - 21);
+                ball.setSpeedY(ball.getSpeedY() * -1);
+                if(this.getKeyManager().left || this.getKeyManager().right){
+                    // speed up
+                    if(ball.getSpeedX() > 0){
+                        ball.setSpeedX(ball.getSpeedX() + 1);
+                    }
+                    else{
+                        ball.setSpeedX(ball.getSpeedX() - 1);
+                    }
+                    ball.setSpeedY(ball.getSpeedY() - 1);
                 }
                 else{
-                    ball.setSpeedX(ball.getSpeedX() - 1);
-                }
-                ball.setSpeedY(ball.getSpeedY() - 1);
-            }
-            else{
-                // slow down
-                if(ball.getSpeedX() > 0 && ball.getSpeedX() != 1){
-                    ball.setSpeedX(ball.getSpeedX() - 1);
-                }
-                else if(ball.getSpeedX() < 0 && ball.getSpeedX() != -1){
-                    ball.setSpeedX(ball.getSpeedX() + 1);
-                }
-                if(ball.getSpeedY() != -1){
-                    ball.setSpeedY(ball.getSpeedY() + 1);
+                    // slow down
+                    if(ball.getSpeedX() > 0 && ball.getSpeedX() != 1){
+                        ball.setSpeedX(ball.getSpeedX() - 1);
+                    }
+                    else if(ball.getSpeedX() < 0 && ball.getSpeedX() != -1){
+                        ball.setSpeedX(ball.getSpeedX() + 1);
+                    }
+                    if(ball.getSpeedY() != -1){
+                        ball.setSpeedY(ball.getSpeedY() + 1);
+                    }
                 }
             }
+        }
+        
+        // tick all the perks
+        for(int i = 0; i < perks.size(); i++){
+            perks.get(i).tick();
         }
     }
     
@@ -217,9 +241,17 @@ public class Game implements Runnable {
             g = bs.getDrawGraphics();
             g.drawImage(Assets.background, 0, 0, width, height, null);
             bar.render(g);
-            ball.render(g);
+            // render all the balls
+            for(int i = 0; i < balls.size(); i++){
+                balls.get(i).render(g);
+            }
+            // render all the bricks
             for (Brick brick : bricks) {
                 brick.render(g);
+            }
+            // render all the perks
+            for(int i = 0; i < perks.size(); i++){
+                perks.get(i).render(g);
             }
             bs.show();
             g.dispose();

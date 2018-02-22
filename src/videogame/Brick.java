@@ -18,27 +18,25 @@ public class Brick extends Item{
 
     private Game game;
     private int power;
+    private int hiddenPerk;
     
-    
-    public Brick(int x, int y, int width, int height, int power ,Game game) {
+    public Brick(int x, int y, int width, int height, int power ,Game game, int hiddenPerk) {
         super(x, y, width, height);
         this.game = game;
         this.power = power;
+        this.hiddenPerk = hiddenPerk;
     }
 
     public int getPower() {
         return power;
     }
 
+    public int getHiddenPerk() {
+        return hiddenPerk;
+    }
+
     public void setPower(int power) {
         this.power = power;
-    }
-    
-    public Brick copy(Brick brick){
-        
-        Brick other = new Brick(brick.getX(),brick.getY(),brick.getWidth(),brick.getHeight(),brick.getPower()-1,brick.game);
-                
-        return other;
     }
     
     @Override

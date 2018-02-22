@@ -57,6 +57,14 @@ public class Ball extends Item{
             setX(0);
             setSpeedX(getSpeedX() * -1);
         }
+        if(getY() + 20 >= game.getHeight()){
+            setY(game.getHeight() - 20);
+            setSpeedY(getSpeedY() * -1);
+        }
+        else if(getY() <= 0){
+            setY(0);
+            setSpeedY(getSpeedY() * -1);
+        }
 
     }
 
