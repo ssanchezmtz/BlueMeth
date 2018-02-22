@@ -146,7 +146,10 @@ public class Game implements Runnable {
             // moving the ball based on the bar
             ball.setX(bar.getX() + bar.getWidth() / 2 - ball.getWidth() / 2);
         }
-        
+        if(bricks.size()==49){
+            bar.setWidth(bar.getWidth()*2);
+            Assets.bar = ImageLoader.loadImage("/images/big-bar.png");
+        }
         // check collision bricks versus ball
         for (int i = 0; i < bricks.size(); i++) {
             Brick brick = (Brick) bricks.get(i);
