@@ -20,6 +20,10 @@ public class Perk extends Item{
         this.ID = ID;
     }
 
+    public int getID() {
+        return ID;
+    }
+
     @Override
     public void tick() {
         setY(getY() + 1);

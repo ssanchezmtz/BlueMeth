@@ -115,9 +115,9 @@ public class Game implements Runnable {
          perks.clear();
          for (int i = 0; i < 10; i++) {
              for (int j = 0; j < 5; j++) {
-                 int perk = (int)(Math.random() * 3.0); // 33% chance of having a perk
+                 int perk = (int)(Math.random() * 4.0); // 25% chance of having a perk
                  if(perk > 0){
-                     perk = (int)(Math.random() * 7.0) + 1; // there are 7 different perks
+                     perk = (int)(Math.random() * 10.0) + 1; // there are 7 different perks
                  }
                  Brick brick = new Brick(i * (width_brick + 3) + 15 , 
                          j * (height_brick + 5) + 15 , width_brick, height_brick, 3, this, perk);
@@ -197,6 +197,41 @@ public class Game implements Runnable {
 
     public KeyManager getKeyManager() {
         return keyManager;
+    }
+    
+    private void trigger(int ID){
+        switch(ID){
+            case 1:
+                System.out.println("Triggered larger bar");
+                break;
+            case 2:
+                System.out.println("Triggered multi-ball");
+                break;
+            case 3:
+                System.out.println("Triggered lower ball");
+                break;
+            case 4:
+                System.out.println("Triggered hold ball");
+                break;
+            case 5:
+                System.out.println("Triggered power up");
+                break;
+            case 6:
+                System.out.println("Triggered bullets");
+                break;
+            case 7:
+                System.out.println("Triggered invisible");
+                break;
+            case 8:
+                System.out.println("Triggered bloody fast");
+                break;
+            case 9:
+                System.out.println("Triggered small bar");
+                break;
+            case 10:
+                System.out.println("Triggered the Jetty !!!");
+                break;
+        }
     }
     
     private void tick() {
@@ -294,9 +329,22 @@ public class Game implements Runnable {
                     }
                 }
             }
-            // tick all the perks
+            // tick all the perks and check for their triggers
             for(int i = 0; i < perks.size(); i++){
-                perks.get(i).tick();
+                Perk perk = perks.get(i);
+                perk.tick();
+                if(bar.intersects(perk)){
+                    // pick it up (triggering its power)
+                    trigger(perk.getID());
+                    // delete this perk
+                    perks.remove(i);
+                    i--;
+                }
+                else if(perk.getY() + perk.getHeight() > getHeight()){
+                    // delete this perk
+                    perks.remove(i);
+                    i--;
+                }
             }
         }
     }
