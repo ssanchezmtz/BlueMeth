@@ -31,8 +31,8 @@ public class Perk extends Item{
 
     @Override
     public void render(Graphics g) {
-        if(ID <= 3){
-            // first three are a reward
+        if(ID <= 6){
+            // first six are rewards
             g.setColor(Color.blue);
         }
         else{

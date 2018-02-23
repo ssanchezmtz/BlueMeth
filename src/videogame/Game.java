@@ -140,12 +140,12 @@ public class Game implements Runnable {
          int height_brick = getHeight() / 3 / 5  - 10;
          for (int i = 0; i < 10; i++) {
              for (int j = 0; j < 5; j++) {
-                 int perk = (int)(Math.random() * 3.0); // 33% chance of having a perk
+                 int perk = (int)(Math.random() * 4.0); // 33% chance of having a perk
                  if(perk > 0){
-                     perk = (int)(Math.random() * 7.0) + 1; // there are 7 different perks
+                     perk = (int)(Math.random() * 10.0) + 1; // there are 7 different perks
                  }
                  Brick brick = new Brick(i * (width_brick + 3) + 15 , 
-                         j * (height_brick + 5) + 15 , width_brick, height_brick, 3, this, perk);
+                         j * (height_brick + 5) + 15 , width_brick, height_brick, 1, this, 2);
                  bricks.add(brick);
              }
          }
@@ -199,13 +199,29 @@ public class Game implements Runnable {
         return keyManager;
     }
     
+    private void multiBall(){
+        if(balls.size() > 0){
+            Ball refBall = balls.get(0);
+            Ball ballA = new Ball(refBall);
+            Ball ballB = new Ball(refBall);
+            Ball ballC = new Ball(refBall);
+            ballA.setSpeedX(ballA.getSpeedX() * -1);
+            ballB.setSpeedY(ballB.getSpeedY() * -1);
+            ballC.setSpeedX(ballC.getSpeedX() * -1);
+            ballC.setSpeedY(ballC.getSpeedY() * -1);
+            balls.add(ballA);
+            balls.add(ballB);
+            balls.add(ballC);
+        }
+    }
+    
     private void trigger(int ID){
         switch(ID){
             case 1:
                 System.out.println("Triggered larger bar");
                 break;
             case 2:
-                System.out.println("Triggered multi-ball");
+                multiBall();
                 break;
             case 3:
                 System.out.println("Triggered lower ball");
@@ -262,7 +278,7 @@ public class Game implements Runnable {
                         }
                     }
                     else if(isDeath()){
-                        setDeath(true); // there are more balls still alive
+                        setDeath(false); // there are more balls still alive
                         balls.remove(i);
                         i--;
                     }

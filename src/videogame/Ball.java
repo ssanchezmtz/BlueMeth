@@ -25,6 +25,18 @@ public class Ball extends Item{
         this.speedY = speedY;
         this.game = game;
     }
+    
+    public Ball(Ball refBall){
+        super(refBall.x, refBall.y, refBall.width, refBall.height);
+        this.speedX = refBall.speedX;
+        this.speedY = refBall.speedY;
+        this.game = refBall.game;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone(); //To change body of generated methods, choose Tools | Templates.
+    }
 
     public int getSpeedX() {
         return speedX;
