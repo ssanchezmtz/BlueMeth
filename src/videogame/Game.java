@@ -212,7 +212,6 @@ public class Game implements Runnable {
                 balls.get(0).setSpeedX(3);
                 balls.get(0).setSpeedY(-3);
             }
-<<<<<<< HEAD
             // moving bar
             bar.tick();
             // if game has started
@@ -231,32 +230,6 @@ public class Game implements Runnable {
                         setDeath(true); // there are more balls still alive
                         balls.remove(i);
                         i--;
-=======
-        } else {
-            // moving the ball based on the bar
-            balls.get(0).setX(bar.getX() + bar.getWidth() / 2 - balls.get(0).getWidth() / 2);
-        }
-        if(bricks.size()==49){
-            bar.setWidth(bar.getWidth()*2);
-            Assets.bar = ImageLoader.loadImage("/images/big-bar.png");
-        }
-        // check collision bricks versus ball
-        for (int i = 0; i < bricks.size(); i++) {
-            Brick brick = (Brick) bricks.get(i);
-            for(int j = 0; j < balls.size(); j++){
-                Ball ball = (Ball) balls.get(j);
-                if (ball.intersects(brick) && brick.getPower() > 1) {
-                    // will not be destroyed
-                    brick.setPower(brick.getPower()-1);
-                    ball.setSpeedY(ball.getSpeedY() * -1);
-                }
-                else if(ball.intersects(brick)){
-                    if(brick.getHiddenPerk() > 0){
-                        // release the perk
-                        Perk releasedPerk = new Perk(brick.getX(), brick.getY(), brick.getWidth(), brick.getHeight(), brick.getHiddenPerk());
-                        perks.add(releasedPerk);
-                        System.out.println("Adding a perk");
->>>>>>> cfb29f0b1e8153d311ccbaeaefb562f333b13d3f
                     }
                 }
             } else {
