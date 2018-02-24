@@ -125,7 +125,7 @@ public class Game implements Runnable {
          bar = new Bar(getWidth() / 2 - 50, getHeight() - 100, 100, 25, this);
          Ball ball = new Ball(getWidth() / 2 - 10, getHeight() - 120, 20, 20, 0, 0, this);
          balls.add(ball);
-         bricks = new ArrayList<Brick>();
+         bricks = new ArrayList<>();
          int width_brick = getWidth() / 10 - 6;
          int height_brick = getHeight() / 3 / 5  - 10;
          for (int i = 0; i < 10; i++) {
