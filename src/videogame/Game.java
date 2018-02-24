@@ -499,19 +499,37 @@ public class Game implements Runnable {
         else
         {
             g = bs.getDrawGraphics();
-            g.drawImage(Assets.background, 0, 0, width, height, null);
-            bar.render(g);
-            // render all the balls
-            for(int i = 0; i < balls.size(); i++){
-                balls.get(i).render(g);
+            // render the elements of the game
+            if(running){
+                if(paused){
+                    g.drawImage(Assets.pauseBackground, 0, 0, width, height, null);
+                }
+                else{
+                    g.drawImage(Assets.background, 0, 0, width, height, null);
+                    bar.render(g);
+                    // render all the balls
+                    for(int i = 0; i < balls.size(); i++){
+                        balls.get(i).render(g);
+                    }
+                    // render all the bricks
+                    for (Brick brick : bricks) {
+                        brick.render(g);
+                    }
+                    // render all the perks
+                    for(int i = 0; i < perks.size(); i++){
+                        perks.get(i).render(g);
+                    }
+                }
             }
-            // render all the bricks
-            for (Brick brick : bricks) {
-                brick.render(g);
-            }
-            // render all the perks
-            for(int i = 0; i < perks.size(); i++){
-                perks.get(i).render(g);
+            else{
+                // render lose or win screen
+                if(bricks.size() == 0){
+                    // you win !!!
+                    g.drawImage(Assets.winBackground, 0, 0, width, height, null);
+                }
+                else{
+                    g.drawImage(Assets.loseBackground, 0, 0, width, height, null);
+                }
             }
             bs.show();
             g.dispose();

@@ -133,5 +133,8 @@ public class Ball extends Item{
         if(!isInvisible()){
             g.drawImage(Assets.ball, getX(), getY(), getWidth(), getHeight(), null);
         }
+        else{
+            g.drawImage(Assets.invisibleBall, getX(), getY(), getWidth(), getHeight(), null);
+        }
    }
 }
