@@ -17,6 +17,7 @@ public class Ball extends Item{
     private Game game;
     private int speedX;     // speed x
     private int speedY;     // speed y
+    private boolean invisible;
     
     public Ball(int x, int y, int width, int height, int speedX, int speedY, 
             Game game) {
@@ -24,6 +25,13 @@ public class Ball extends Item{
         this.speedX = speedX;
         this.speedY = speedY;
         this.game = game;
+    }
+    
+    public Ball(Ball refBall){
+        super(refBall.x, refBall.y, refBall.width, refBall.height);
+        this.speedX = refBall.speedX;
+        this.speedY = refBall.speedY;
+        this.game = refBall.game;
     }
 
     public int getSpeedX() {
@@ -34,6 +42,10 @@ public class Ball extends Item{
         return speedY;
     }
 
+    public boolean isInvisible() {
+        return invisible;
+    }
+
     public void setSpeedX(int speedX) {
         this.speedX = speedX;
     }
@@ -42,6 +54,9 @@ public class Ball extends Item{
         this.speedY = speedY;
     }
 
+    public void setInvisible(boolean invisible) {
+        this.invisible = invisible;
+    }
     
     @Override
     public void tick() {

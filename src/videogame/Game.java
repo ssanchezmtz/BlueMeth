@@ -11,6 +11,7 @@ import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import javafx.util.Pair;
 
 /**
  *
@@ -36,7 +37,8 @@ public class Game implements Runnable {
     private int lives;
     private int score;
     final private int LIVES;
-    
+    // store pairs of IDs and times of activeness to represent active perks
+    private ArrayList<Pair<Integer, Integer>> activePerks;
     
     /**
      * to create title, width and height and set the game is still not running
@@ -45,6 +47,7 @@ public class Game implements Runnable {
      * @param height  to set the height of the window
      */
     public Game(String title, int width, int height) {
+        this.activePerks = new ArrayList<Pair<Integer, Integer>>();
         this.balls = new ArrayList<Ball>();
         this.perks = new ArrayList<Perk>();
         this.title = title;
@@ -109,21 +112,8 @@ public class Game implements Runnable {
          Ball ball = new Ball(getWidth() / 2 - 10, getHeight() - 120, 20, 20, 0, 0, this);
          balls.clear();
          balls.add(ball);
-         bricks.clear();
-         int width_brick = getWidth() / 10 - 6;
-         int height_brick = getHeight() / 3 / 5  - 10;
          perks.clear();
-         for (int i = 0; i < 10; i++) {
-             for (int j = 0; j < 5; j++) {
-                 int perk = (int)(Math.random() * 4.0); // 25% chance of having a perk
-                 if(perk > 0){
-                     perk = (int)(Math.random() * 10.0) + 1; // there are 7 different perks
-                 }
-                 Brick brick = new Brick(i * (width_brick + 3) + 15 , 
-                         j * (height_brick + 5) + 15 , width_brick, height_brick, 3, this, perk);
-                 bricks.add(brick);
-             }
-         }
+         activePerks.clear();
     }
     
     /**
@@ -140,12 +130,12 @@ public class Game implements Runnable {
          int height_brick = getHeight() / 3 / 5  - 10;
          for (int i = 0; i < 10; i++) {
              for (int j = 0; j < 5; j++) {
-                 int perk = (int)(Math.random() * 3.0); // 33% chance of having a perk
+                 int perk = (int)(Math.random() * 4.0); // 33% chance of having a perk
                  if(perk > 0){
-                     perk = (int)(Math.random() * 7.0) + 1; // there are 7 different perks
+                     perk = (int)(Math.random() * 10.0) + 1; // there are 7 different perks
                  }
                  Brick brick = new Brick(i * (width_brick + 3) + 15 , 
-                         j * (height_brick + 5) + 15 , width_brick, height_brick, 3, this, perk);
+                         j * (height_brick + 5) + 15 , width_brick, height_brick, 1, this, 8);
                  bricks.add(brick);
              }
          }
@@ -199,19 +189,38 @@ public class Game implements Runnable {
         return keyManager;
     }
     
-    private void trigger(int ID){
+    private void multiBall(){
+        if(balls.size() > 0){
+            Ball refBall = balls.get(0);
+            Ball ballA = new Ball(refBall);
+            Ball ballB = new Ball(refBall);
+            Ball ballC = new Ball(refBall);
+            ballA.setSpeedX(ballA.getSpeedX() * -1);
+            ballB.setSpeedY(ballB.getSpeedY() * -1);
+            ballC.setSpeedX(ballC.getSpeedX() * -1);
+            ballC.setSpeedY(ballC.getSpeedY() * -1);
+            balls.add(ballA);
+            balls.add(ballB);
+            balls.add(ballC);
+        }
+    }
+    
+    private void enablePerk(int ID){
         switch(ID){
             case 1:
                 System.out.println("Triggered larger bar");
+                bar.setX(bar.getX() - bar.getWidth() / 2);
+                bar.setWidth(bar.getWidth() * 2);
                 break;
             case 2:
-                System.out.println("Triggered multi-ball");
+                System.out.println("Triggered multi ball");
+                multiBall();
                 break;
             case 3:
-                System.out.println("Triggered lower ball");
+                System.out.println("Triggered lower bound (immunity)");
                 break;
             case 4:
-                System.out.println("Triggered hold ball");
+                System.out.println("Triggered hold ball"); // messes with "started"
                 break;
             case 5:
                 System.out.println("Triggered power up");
@@ -221,15 +230,67 @@ public class Game implements Runnable {
                 break;
             case 7:
                 System.out.println("Triggered invisible");
+                for(int i = 0; i < balls.size(); i++){
+                    Ball ball = balls.get(i);
+                    ball.setInvisible(true);
+                }
                 break;
             case 8:
                 System.out.println("Triggered bloody fast");
+                for(int i = 0; i < balls.size(); i++){
+                    Ball ball = balls.get(i);
+                    ball.setSpeedX(ball.getSpeedX() * 2);
+                    ball.setSpeedY(ball.getSpeedY() * 2);
+                }
                 break;
             case 9:
                 System.out.println("Triggered small bar");
+                bar.setX(bar.getX() + bar.getWidth() / 4);
+                bar.setWidth(bar.getWidth() / 2);
                 break;
             case 10:
                 System.out.println("Triggered the Jetty !!!");
+                break;
+        }
+    }
+    
+    private void disablePerk(int ID){
+        switch(ID){
+            case 1:
+                System.out.println("Disabling larger bar");
+                bar.setX(bar.getX() + bar.getWidth() / 4);
+                bar.setWidth(bar.getWidth() / 2);
+                break;
+            case 3:
+                System.out.println("Disabling lower bound (immunity)");
+                break;
+            case 6:
+                System.out.println("Disabling bullets");
+                break;
+            case 7:
+                System.out.println("Disabling invisible");
+                for(int i = 0; i < balls.size(); i++){
+                    Ball ball = balls.get(i);
+                    ball.setInvisible(false);
+                }
+                break;
+            case 8:
+                System.out.println("Disabling bloody fast");
+                for(int i = 0; i < balls.size(); i++){
+                    Ball ball = balls.get(i);
+                    if(ball.getSpeedX() > 1){
+                        ball.setSpeedX(ball.getSpeedX() / 2);
+                        ball.setSpeedY(ball.getSpeedY() / 2);
+                    }
+                }
+                break;
+            case 9:
+                System.out.println("Disabling small bar");
+                bar.setX(bar.getX() - bar.getWidth() / 2);
+                bar.setWidth(bar.getWidth() * 2);
+                break;
+            case 10:
+                System.out.println("Disabling the Jetty !!!");
                 break;
         }
     }
@@ -262,7 +323,7 @@ public class Game implements Runnable {
                         }
                     }
                     else if(isDeath()){
-                        setDeath(true); // there are more balls still alive
+                        setDeath(false); // there are more balls still alive
                         balls.remove(i);
                         i--;
                     }
@@ -329,13 +390,20 @@ public class Game implements Runnable {
                     }
                 }
             }
+            
             // tick all the perks and check for their triggers
             for(int i = 0; i < perks.size(); i++){
                 Perk perk = perks.get(i);
                 perk.tick();
                 if(bar.intersects(perk)){
                     // pick it up (triggering its power)
-                    trigger(perk.getID());
+                    if(perk.getID() != 2 && perk.getID() != 4 && perk.getID() != 5){
+                        enablePerk(perk.getID());
+                        activePerks.add(new Pair<Integer, Integer>(perk.getID(), 0)); // for a while
+                    }
+                    else{
+                        enablePerk(perk.getID()); // just once
+                    }
                     // delete this perk
                     perks.remove(i);
                     i--;
@@ -343,6 +411,17 @@ public class Game implements Runnable {
                 else if(perk.getY() + perk.getHeight() > getHeight()){
                     // delete this perk
                     perks.remove(i);
+                    i--;
+                }
+            }
+            
+            // add time to the enaction of all active perks
+            for(int i = 0; i < activePerks.size(); i++){
+                activePerks.set(i, new Pair<Integer, Integer>(activePerks.get(i).getKey(), activePerks.get(i).getValue() + 1));
+                // disable after 250 frames
+                if(activePerks.get(i).getValue() == 250){
+                    disablePerk(activePerks.get(i).getKey());
+                    activePerks.remove(i);
                     i--;
                 }
             }
