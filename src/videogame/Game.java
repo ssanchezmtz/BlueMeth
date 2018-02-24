@@ -36,6 +36,11 @@ public class Game implements Runnable {
     private int lives;
     private int score;
     final private int LIVES;
+    // booleans for perks
+    private boolean barEnlarged;
+    private boolean barShrinked;
+    private boolean ballInvisible;
+    private boolean fasterBall;
     
     
     /**
@@ -109,21 +114,7 @@ public class Game implements Runnable {
          Ball ball = new Ball(getWidth() / 2 - 10, getHeight() - 120, 20, 20, 0, 0, this);
          balls.clear();
          balls.add(ball);
-         bricks.clear();
-         int width_brick = getWidth() / 10 - 6;
-         int height_brick = getHeight() / 3 / 5  - 10;
          perks.clear();
-         for (int i = 0; i < 10; i++) {
-             for (int j = 0; j < 5; j++) {
-                 int perk = (int)(Math.random() * 4.0); // 25% chance of having a perk
-                 if(perk > 0){
-                     perk = (int)(Math.random() * 10.0) + 1; // there are 7 different perks
-                 }
-                 Brick brick = new Brick(i * (width_brick + 3) + 15 , 
-                         j * (height_brick + 5) + 15 , width_brick, height_brick, 3, this, perk);
-                 bricks.add(brick);
-             }
-         }
     }
     
     /**
@@ -145,7 +136,7 @@ public class Game implements Runnable {
                      perk = (int)(Math.random() * 10.0) + 1; // there are 7 different perks
                  }
                  Brick brick = new Brick(i * (width_brick + 3) + 15 , 
-                         j * (height_brick + 5) + 15 , width_brick, height_brick, 1, this, 2);
+                         j * (height_brick + 5) + 15 , width_brick, height_brick, 3, this, perk);
                  bricks.add(brick);
              }
          }
@@ -224,10 +215,10 @@ public class Game implements Runnable {
                 multiBall();
                 break;
             case 3:
-                System.out.println("Triggered lower ball");
+                System.out.println("Triggered lower bound (immunity)");
                 break;
             case 4:
-                System.out.println("Triggered hold ball");
+                System.out.println("Triggered hold ball"); // messes with "started"
                 break;
             case 5:
                 System.out.println("Triggered power up");
