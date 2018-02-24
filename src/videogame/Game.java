@@ -15,7 +15,8 @@ import javafx.util.Pair;
 
 /**
  *
- * @author antoniomejorado
+ * @author Arturo Arenas Esparza (A00820982)
+ * @author Sergio Sanchez Martinez
  */
 public class Game implements Runnable {
     private BufferStrategy bs;          // to have several buffers when displaying
@@ -27,16 +28,16 @@ public class Game implements Runnable {
     private Thread thread;              // thread to create the game
     private boolean running;            // to set the game
     private boolean started;            // to start the game
-    private boolean paused;
-    private boolean death;
+    private boolean paused;             // pause status
+    private boolean death;              // death status
     private Bar bar;                    // to use a bar
     private ArrayList<Ball> balls;      // to have multiple balls when rewarded 
     private ArrayList<Brick> bricks;    // bricks
     private ArrayList<Perk> perks;      // perks
     private KeyManager keyManager;      // to manage the keyboard
-    private int lives;
-    private int score;
-    final private int LIVES;
+    private int lives;                  // amount of lives left
+    private int score;                  // score of the player
+    final private int LIVES;            // initial amount of lives
     // store pairs of IDs and times of activeness to represent active perks
     private ArrayList<Pair<Integer, Integer>> activePerks;
     
@@ -79,34 +80,65 @@ public class Game implements Runnable {
         return height;
     }
 
+    /**
+     * Getter for the started status of the game
+     * @return the started status of the game
+     */
     public boolean isStarted() {
         return started;
     }
 
+    /**
+     * Gets the amount of lives left 
+     * @return the amount of lives left
+     */
     public int getLives() {
         return lives;
     }
 
+    /**
+     * Getter for the death status of the game
+     * @return the death status of the game
+     */
     public boolean isDeath() {
         return death;
     }
 
+    /**
+     * Setter for the started status of the game
+     * @param started the started status of the game
+     */
     public void setStarted(boolean started) {
         this.started = started;
     }
 
+    /**
+     * Sets the amount of lives left 
+     * @param lives the amount of lives left
+     */
     public void setLives(int lives) {
         this.lives = lives;
     }
 
+    /**
+     * Setter for the death status of the game
+     * @param death the death status of the game
+     */
     public void setDeath(boolean death) {
         this.death = death;
     }
 
+    /**
+     * Setter for the running status of the game
+     * @param running the running status of the game
+     */
     public void setRunning(boolean running) {
         this.running = running;
     }
     
+    /**
+     * Resets initial positions of the elements of the game
+     */
     public void restart(){
          bar = new Bar(getWidth() / 2 - 50, getHeight() - 100, 100, 25, this);
          Ball ball = new Ball(getWidth() / 2 - 10, getHeight() - 120, 20, 20, 0, 0, this);
@@ -135,13 +167,16 @@ public class Game implements Runnable {
                      perk = (int)(Math.random() * 10.0) + 1; // there are 7 different perks
                  }
                  Brick brick = new Brick(i * (width_brick + 3) + 15 , 
-                         j * (height_brick + 5) + 15 , width_brick, height_brick, 1, this, 8);
+                         j * (height_brick + 5) + 15 , width_brick, height_brick, 3, this, perk);
                  bricks.add(brick);
              }
          }
          display.getJframe().addKeyListener(keyManager);
     }
     
+    /**
+     * Runs the game
+     */
     @Override
     public void run() {
         init();
@@ -185,10 +220,17 @@ public class Game implements Runnable {
         // stop(); we should use something like thread.sleep() and then close
     }
 
+    /**
+     * Getter for the key manager
+     * @return the key manager of the game
+     */
     public KeyManager getKeyManager() {
         return keyManager;
     }
     
+    /**
+     * Clones the first ball three times
+     */
     private void multiBall(){
         if(balls.size() > 0){
             Ball refBall = balls.get(0);
@@ -205,6 +247,10 @@ public class Game implements Runnable {
         }
     }
     
+    /**
+     * Enables an active perk
+     * @param ID the ID of the perk to be enabled 
+     */
     private void enablePerk(int ID){
         switch(ID){
             case 1:
@@ -254,6 +300,10 @@ public class Game implements Runnable {
         }
     }
     
+    /**
+     * Disables an active perk
+     * @param ID the ID of the perk to be disabled 
+     */
     private void disablePerk(int ID){
         switch(ID){
             case 1:
@@ -295,6 +345,9 @@ public class Game implements Runnable {
         }
     }
     
+    /**
+     * Updates the elements of the game
+     */
     private void tick() {
         keyManager.tick();
         if(getKeyManager().isPause()){
@@ -428,6 +481,9 @@ public class Game implements Runnable {
         }
     }
     
+    /**
+     * Paints the elements of the game
+     */
     private void render() {
         // get the buffer strategy from the display
         bs = display.getCanvas().getBufferStrategy();

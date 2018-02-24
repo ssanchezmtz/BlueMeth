@@ -65,7 +65,7 @@ public class Display {
 
     /**
      * to get the jframe of the game
-     * @return jframe
+     * @return <code>JFrame</code> of the game
      */
     public JFrame getJframe() {
         return jframe;
@@ -73,7 +73,7 @@ public class Display {
     
     /**
      * to get the canvas of the game
-     * @return the canvas
+     * @return the <code>Canvas</code> of the game
      */
     public Canvas getCanvas() {
         return canvas;

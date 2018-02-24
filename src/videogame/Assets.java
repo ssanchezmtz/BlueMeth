@@ -9,12 +9,13 @@ import java.awt.image.BufferedImage;
 
 /**
  *
- * @author antoniomejorado
+ * @author Arturo Arenas Esparza (A00820982)
+ * @author Sergio Sanchez Martinez
  */
 public class Assets {
     public static BufferedImage background; // to store background image
-    public static BufferedImage bar;     // to store the bar image
-    public static BufferedImage ball;     // to store the ball image
+    public static BufferedImage bar;        // to store the bar image
+    public static BufferedImage ball;       // to store the ball image
     public static BufferedImage brick1;     // to store the ball image
     public static BufferedImage brick2;     // to store the ball image
     public static BufferedImage brick3;     // to store the ball image

@@ -16,13 +16,15 @@ import java.awt.Rectangle;
 public abstract class Item {
     protected int x;        // to store x position
     protected int y;        // to store y position
-    protected int width;    //  to width
-    protected int height;   //  to get geight
+    protected int width;    // to store width
+    protected int height;   // to store height
     
     /**
      * Set the initial values to create the item
      * @param x <b>x</b> position of the object
      * @param y <b>y</b> position of the object
+     * @param width the width of the object
+     * @param height the height of the object
      */
     public Item(int x, int y, int width, int height) {
         this.x = x;
@@ -32,33 +34,39 @@ public abstract class Item {
     }
 
     /**
-     * Get x value
-     * @return x 
+     * Get <b>x</b> value
+     * @return <b>x</b> position of the object
      */
     public int getX() {
         return x;
     }
 
     /**
-     * Get y value
-     * @return y 
+     * Get <b>y</b> value
+     * @return <b>y</b> position of the object
      */
     public int getY() {
         return y;
     }
 
+    /**
+     * Get <b>width</b> value
+     * @return <b>y</b> position of the object
+     */
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * Get <b>height</b> value
+     * @return <b>height</b> position of the object
+     */
     public int getHeight() {
         return height;
     }
 
-    public int getWidth() {
-        return width;
-    }
-    
-    
-
     /**
-     * Set x value
+     * Set <b>x</b> value
      * @param x to modify
      */
     public void setX(int x) {
@@ -66,21 +74,43 @@ public abstract class Item {
     }
 
     /**
-     * Set y value
+     * Set <b>y</b> value
      * @param y to modify
      */
     public void setY(int y) {
         this.y = y;
     }
-
+    
+    /**
+     * Set <b>width</b> value
+     * @param width to modify
+     */
     public void setWidth(int width) {
         this.width = width;
     }
 
+    /**
+     * Set <b>height</b> value
+     * @param height to modify
+     */
     public void setHeight(int height) {
         this.height = height;
     }
+
+    /**
+     * Determines if this item intersects another item
+     * @param obj the other object
+     * @return a boolean value with the result
+     */
+    public boolean intersects(Object obj) {
+        // check if the object is an Item
+        return (obj instanceof Item && 
+                this.getBounds().intersects(((Item) obj).getBounds()));
+    }
     
+    private Rectangle getBounds() {
+        return new Rectangle(getX(), getY(), getWidth(), getHeight());
+    }
     /**
      * To update positions of the item for every tick
      */
@@ -88,16 +118,7 @@ public abstract class Item {
     
     /**
      * To paint the item
-     * @param g <b>Graphics</b> object to paint the item
+     * @param g <code>Graphics</code> object to paint the item
      */
     public abstract void render(Graphics g);
-    
-    private Rectangle getBounds() {
-        return new Rectangle(getX(), getY(), getWidth(), getHeight());
-    }
-    
-    public boolean intersects(Object obj) {
-        return (obj instanceof Item && 
-                this.getBounds().intersects(((Item) obj).getBounds()));
-    }
 }
